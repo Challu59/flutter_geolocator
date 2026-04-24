@@ -47,16 +47,38 @@ class _LocationScreenState extends State<LocationScreen> {
             ),
             SizedBox(height: 20,),
             ElevatedButton(
-                onPressed: ()=>{
-              
-            }, 
+                onPressed: (){
+                _getLocation();
+            },
                 child: Text("Get current GPS location")),
-            
+
           ],
         ),
       ),
     );
   }
+Future<void> _getLocation() async{
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if(!serviceEnabled){
+      setState(() {
+        _locationMessage = "Location service is not enabled, please enable it";
+      });
+    }
 
+    LocationPermission permission = await Geolocator.checkPermission();
+    if(permission == LocationPermission.denied){
+        permission = await Geolocator.requestPermission();
+        if(permission == LocationPermission.denied){
+          setState(() {
+            _locationMessage = "Location permission is denied";
+          });
+        }
+    }
 
+    if(permission == LocationPermission.deniedForever){
+      setState(() {
+        _locationMessage = "Location permission is denied forever, please enable it from settings.";
+      });
+    }
+  }
 }
