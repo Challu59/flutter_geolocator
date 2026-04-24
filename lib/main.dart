@@ -50,7 +50,14 @@ class _LocationScreenState extends State<LocationScreen> {
                 onPressed: (){
                 _getLocation();
             },
-                child: Text("Get current GPS location")),
+                child: Text("Get current GPS location")
+            ),
+
+            if (_currentPosition != null) ...[
+              SizedBox(height: 10,),
+              Text("Latitude: ${_currentPosition!.latitude.toStringAsFixed(6)}"),
+              Text("Longitude: ${_currentPosition!.longitude.toStringAsFixed(6)}"),
+            ]
 
           ],
         ),
@@ -80,5 +87,23 @@ Future<void> _getLocation() async{
         _locationMessage = "Location permission is denied forever, please enable it from settings.";
       });
     }
+
+    try{
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 10),
+      );
+
+      setState(() {
+        _locationMessage = "Location found";
+        _currentPosition = position;
+      });
+    }
+    catch(e){
+      setState(() {
+        _locationMessage = "Error: $e";
+      });
+    }
+
   }
 }
