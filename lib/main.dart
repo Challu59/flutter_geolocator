@@ -59,40 +59,42 @@ class _LocationScreenState extends State<LocationScreen> {
               SizedBox(height: 10,),
               Text("Latitude: ${_currentPosition!.latitude.toStringAsFixed(6)}"),
               Text("Longitude: ${_currentPosition!.longitude.toStringAsFixed(6)}"),
-            ],
-            SizedBox(height: 20,),
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: FlutterMap(options:
-                  MapOptions(
-                    initialCenter: LatLng(
-                      _currentPosition!.latitude,
-                      _currentPosition!.longitude,
-                    ),
-                    initialZoom: 15,
+
+              SizedBox(height: 20,),
+              SizedBox(
+                height: 300,
+                width: double.infinity,
+                child: FlutterMap(options:
+                MapOptions(
+                  initialCenter: LatLng(
+                    _currentPosition!.latitude,
+                    _currentPosition!.longitude,
                   ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    ),
-                    MarkerLayer(markers: [
-                      Marker(point: LatLng(
+                  initialZoom: 15,
+                ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      ),
+                      MarkerLayer(markers: [
+                        Marker(point: LatLng(
                           _currentPosition!.latitude,
                           _currentPosition!.longitude,
-                      ),
-                          width: 40,
-                          height: 40,
-                          child: Icon(
-                            Icons.location_pin,
-                            color: Colors.red,
-                            size: 40,
-                          ))
-                    ])
-                  ]
+                        ),
+                            width: 40,
+                            height: 40,
+                            child: Icon(
+                              Icons.location_pin,
+                              color: Colors.red,
+                              size: 40,
+                            ))
+                      ])
+                    ]
 
-              ),
-            )
+                ),
+              )
+            ],
+
           ],
         ),
       ),
