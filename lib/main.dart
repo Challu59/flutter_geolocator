@@ -74,7 +74,9 @@ class _LocationScreenState extends State<LocationScreen> {
                 ),
                     children: [
                       TileLayer(
-                        urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                        urlTemplate: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+                        subdomains: ['a', 'b', 'c'],
+                        userAgentPackageName: 'com.aayush.flutter_geolocator',
                       ),
                       MarkerLayer(markers: [
                         Marker(point: LatLng(
