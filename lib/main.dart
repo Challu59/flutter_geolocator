@@ -27,6 +27,13 @@ class _LocationScreenState extends State<LocationScreen> {
   String _locationMessage = "Press the button to get location";
   Position? _currentPosition;
 
+  //dummy friend locations
+  List<LatLng> _friendLocations = [
+    LatLng(27.6940, 85.2870),
+    LatLng(27.7000, 85.3333),
+    LatLng(27.7100, 85.3100),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,6 +62,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Text("Get current GPS location")
             ),
 
+            //show the widgets only after current position is fetched
             if (_currentPosition != null) ...[
               SizedBox(height: 10,),
               Text("Latitude: ${_currentPosition!.latitude.toStringAsFixed(6)}"),
@@ -89,7 +97,14 @@ class _LocationScreenState extends State<LocationScreen> {
                               Icons.location_pin,
                               color: Colors.red,
                               size: 40,
-                            ))
+                            )),
+                        ..._friendLocations.map((location) => Marker(
+                            point: location,
+                            child: Icon(
+                              Icons.person_pin_circle,
+                              color: Colors.blue,
+                              size: 40,
+                            )))
                       ])
                     ]
 
