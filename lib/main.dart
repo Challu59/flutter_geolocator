@@ -88,6 +88,23 @@ class _LocationScreenState extends State<LocationScreen> {
         children: [
           _buildStatusCard(),
           SizedBox(height: 20,),
+
+          Expanded(
+              child:
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child:
+                  Stack(
+                    children: [
+                      _buildMap(),
+                      // _buildActionOverlay(),
+                    ],
+                  ),
+                ),
+
+          ),
+
+
           Text(
             _locationMessage,
             style: TextStyle(fontSize: 18),
@@ -110,46 +127,6 @@ class _LocationScreenState extends State<LocationScreen> {
             SizedBox(
               height: 300,
               width: double.infinity,
-              child: FlutterMap(options:
-              MapOptions(
-                initialCenter: LatLng(
-                  _currentPosition!.latitude,
-                  _currentPosition!.longitude,
-                ),
-                initialZoom: 15,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all,
-                ),
-              ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-                      subdomains: ['a', 'b', 'c'],
-                      userAgentPackageName: 'com.aayush.flutter_geolocator',
-                    ),
-                    MarkerLayer(markers: [
-                      Marker(point: LatLng(
-                        _currentPosition!.latitude,
-                        _currentPosition!.longitude,
-                      ),
-                          width: 40,
-                          height: 40,
-                          child: Icon(
-                            Icons.location_pin,
-                            color: Colors.red,
-                            size: 40,
-                          )),
-                      ..._friendLocations.map((location) => Marker(
-                          point: location,
-                          child: Icon(
-                            Icons.person_pin_circle,
-                            color: Colors.blue,
-                            size: 40,
-                          )))
-                    ])
-                  ]
-
-              ),
             )
           ],
 
@@ -162,28 +139,40 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   //buildStatusCard widget
-  Widget _buildStatusCard() {
+  Widget _buildStatusCard(){
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey),
+          border: Border.all(color: Colors.grey),
       ),
-      child: Row(
+      child:
+      Row(
         children: [
-          const Icon(Icons.my_location, color: Colors.white),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("CURRENT STATUS",
-                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.bold)),
-                Text(_status, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              ],
-            ),
-          ),
+          Icon(Icons.my_location, color: Colors.white,),
+          SizedBox(width: 20,),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("CURRENT STATUS",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 2,),
+              Text(_status,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              )
+            ],
+          )),
+
+
         ],
       ),
     );
@@ -191,6 +180,47 @@ class _LocationScreenState extends State<LocationScreen> {
 
 
   //buildMap widget
+Widget _buildMap(){
+    return FlutterMap(
+      mapController: _mapController,
+        options: MapOptions(
+      initialCenter: LatLng(27.7172, 85.3240),
+      initialZoom: 13,
+      interactionOptions: const InteractionOptions(
+        flags: InteractiveFlag.all,
+      ),
+    ),
+        children: [
+          TileLayer(
+            urlTemplate: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+            subdomains: ['a', 'b', 'c'],
+            userAgentPackageName: 'com.aayush.flutter_geolocator',
+          ),
+          MarkerLayer(markers: [
+            if(_currentPosition != null)
+            Marker(point: LatLng(
+              _currentPosition!.latitude,
+              _currentPosition!.longitude,
+            ),
+                width: 40,
+                height: 40,
+                child: Icon(
+                  Icons.location_pin,
+                  color: Colors.red,
+                  size: 40,
+                )),
+            ..._friendLocations.map((location) => Marker(
+                point: location,
+                child: Icon(
+                  Icons.person_pin_circle,
+                  color: Colors.blue,
+                  size: 40,
+                )))
+          ])
+        ]
+
+    );
+}
 
   //buildActionOverlay widget
 
