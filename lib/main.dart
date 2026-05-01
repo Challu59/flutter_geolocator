@@ -41,114 +41,160 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  String _locationMessage = "Press the button to get location";
+  String _locationMessage = "Press the button to get location"; // to remove
+  String _status = "Ready to locate your location";
   Position? _currentPosition;
+  final MapController _mapController = MapController();
 
   //dummy friend locations
-  List<LatLng> _friendLocations = [
-    LatLng(27.6940, 85.2870),
-    LatLng(27.7000, 85.3333),
-    LatLng(27.7100, 85.3100),
+  final List<LatLng> _friendLocations = [
+    const LatLng(27.6940, 85.2870),
+    const LatLng(27.7000, 85.3333),
+    const LatLng(27.7100, 85.3100),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      // appbar
       appBar: AppBar(title:
       Text("Flutter geolocation",
       style: TextStyle(
         color: Colors.white,
         letterSpacing: 3,
-        // fontSize: 20
         fontWeight: FontWeight.bold
       )),
+
+        shape: Border(
+          bottom: BorderSide(
+            color: Colors.grey,
+            width: 2,
+          )
+        ),
         backgroundColor: Colors.transparent,
         centerTitle: true,
         leading: Icon(Icons.gps_fixed),
-
-        // actions: [
-        //   IconButton(onPressed: (){
-        //     ScaffoldMessenger.of(context).showSnackBar(
-        //         const SnackBar(content: Text("This is an alert!")));
-        //   },
-        //       icon: Icon(Icons.add_alert))
-        // ],
+        bottom: PreferredSize(
+            preferredSize: Size.fromHeight(8),
+            child: Container(),
+            ),
 
       ),
-      body: Center(
+
+      //body
+      body: Padding(padding: EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-                _locationMessage,
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 20,),
-            ElevatedButton(
-                onPressed: (){
+        children: [
+          _buildStatusCard(),
+          SizedBox(height: 20,),
+          Text(
+            _locationMessage,
+            style: TextStyle(fontSize: 18),
+          ),
+          SizedBox(height: 20,),
+          ElevatedButton(
+              onPressed: (){
                 _getLocation();
-            },
-                child: Text("Get current GPS location")
-            ),
+              },
+              child: Text("Get current GPS location")
+          ),
 
-            //show the widgets only after current position is fetched
-            if (_currentPosition != null) ...[
-              SizedBox(height: 10,),
-              Text("Latitude: ${_currentPosition!.latitude.toStringAsFixed(6)}"),
-              Text("Longitude: ${_currentPosition!.longitude.toStringAsFixed(6)}"),
+          //show the widgets only after current position is fetched
+          if (_currentPosition != null) ...[
+            SizedBox(height: 10,),
+            Text("Latitude: ${_currentPosition!.latitude.toStringAsFixed(6)}"),
+            Text("Longitude: ${_currentPosition!.longitude.toStringAsFixed(6)}"),
 
-              SizedBox(height: 20,),
-              SizedBox(
-                height: 300,
-                width: double.infinity,
-                child: FlutterMap(options:
-                MapOptions(
-                  initialCenter: LatLng(
-                    _currentPosition!.latitude,
-                    _currentPosition!.longitude,
-                  ),
-                  initialZoom: 15,
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.all,
-                  ),
+            SizedBox(height: 20,),
+            SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: FlutterMap(options:
+              MapOptions(
+                initialCenter: LatLng(
+                  _currentPosition!.latitude,
+                  _currentPosition!.longitude,
                 ),
-                    children: [
-                      TileLayer(
-                        urlTemplate: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-                        subdomains: ['a', 'b', 'c'],
-                        userAgentPackageName: 'com.aayush.flutter_geolocator',
+                initialZoom: 15,
+                interactionOptions: const InteractionOptions(
+                  flags: InteractiveFlag.all,
+                ),
+              ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+                      subdomains: ['a', 'b', 'c'],
+                      userAgentPackageName: 'com.aayush.flutter_geolocator',
+                    ),
+                    MarkerLayer(markers: [
+                      Marker(point: LatLng(
+                        _currentPosition!.latitude,
+                        _currentPosition!.longitude,
                       ),
-                      MarkerLayer(markers: [
-                        Marker(point: LatLng(
-                          _currentPosition!.latitude,
-                          _currentPosition!.longitude,
-                        ),
-                            width: 40,
-                            height: 40,
-                            child: Icon(
-                              Icons.location_pin,
-                              color: Colors.red,
-                              size: 40,
-                            )),
-                        ..._friendLocations.map((location) => Marker(
-                            point: location,
-                            child: Icon(
-                              Icons.person_pin_circle,
-                              color: Colors.blue,
-                              size: 40,
-                            )))
-                      ])
-                    ]
+                          width: 40,
+                          height: 40,
+                          child: Icon(
+                            Icons.location_pin,
+                            color: Colors.red,
+                            size: 40,
+                          )),
+                      ..._friendLocations.map((location) => Marker(
+                          point: location,
+                          child: Icon(
+                            Icons.person_pin_circle,
+                            color: Colors.blue,
+                            size: 40,
+                          )))
+                    ])
+                  ]
 
-                ),
-              )
-            ],
-
+              ),
+            )
           ],
-        ),
+
+        ],
+      ),
+
+      )
+
+    );
+  }
+
+  //buildStatusCard widget
+  Widget _buildStatusCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.my_location, color: Colors.white),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("CURRENT STATUS",
+                    style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.bold)),
+                Text(_status, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
+
+
+  //buildMap widget
+
+  //buildActionOverlay widget
+
+  //function to fetch current location
 Future<void> _getLocation() async{
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if(!serviceEnabled){
