@@ -45,6 +45,7 @@ class _LocationScreenState extends State<LocationScreen> {
   String _status = "Ready to locate your location";
   Position? _currentPosition;
   bool _isLoading = false;
+  bool _showFriends = false;
   final MapController _mapController = MapController();
 
   //dummy friend locations
@@ -98,6 +99,21 @@ class _LocationScreenState extends State<LocationScreen> {
                   Stack(
                     children: [
                       _buildMap(),
+
+                      Positioned(
+                          top: 15,
+                            right: 15,
+                            child: IconButton(
+                                      iconSize: 32,
+                                      onPressed: (){
+                                        setState(() {
+                                          _showFriends = !_showFriends;
+                                        });
+                                      },
+                                      icon: !_showFriends? Icon(Icons.group, color: Colors.black,): Icon(Icons.group_off, color: Colors.black,)),
+
+
+                      ),
                       if (_isLoading)
                         Container(
                           color: Colors.black.withOpacity(0.5),
@@ -197,7 +213,7 @@ Widget _buildMap(){
                     color: Colors.red,
                     size: 40,
                   )),
-              // if(_currentPosition != null)
+              if (_showFriends)
               ..._friendLocations.map((location) =>
                   Marker(
                       point: location,
