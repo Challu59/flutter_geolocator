@@ -19,14 +19,15 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primaryColor: Colors.black,
         scaffoldBackgroundColor: const Color(0xFF151414),
+
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30)
+            padding: EdgeInsets.symmetric(vertical: 14, horizontal: 30)
           )
         )
       ),
@@ -41,9 +42,9 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  String _locationMessage = "Press the button to get location"; // to remove
   String _status = "Ready to locate your location";
   Position? _currentPosition;
+  bool _isLoading = false;
   final MapController _mapController = MapController();
 
   //dummy friend locations
@@ -97,7 +98,17 @@ class _LocationScreenState extends State<LocationScreen> {
                   Stack(
                     children: [
                       _buildMap(),
-                      // _buildActionOverlay(),
+                      if (_isLoading)
+                        Container(
+                          color: Colors.black.withOpacity(0.5),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          ),
+                        ),
+                      _buildActionOverlay(),
                     ],
                   ),
                 ),
@@ -105,30 +116,6 @@ class _LocationScreenState extends State<LocationScreen> {
           ),
 
 
-          Text(
-            _locationMessage,
-            style: TextStyle(fontSize: 18),
-          ),
-          SizedBox(height: 20,),
-          ElevatedButton(
-              onPressed: (){
-                _getLocation();
-              },
-              child: Text("Get current GPS location")
-          ),
-
-          //show the widgets only after current position is fetched
-          if (_currentPosition != null) ...[
-            SizedBox(height: 10,),
-            Text("Latitude: ${_currentPosition!.latitude.toStringAsFixed(6)}"),
-            Text("Longitude: ${_currentPosition!.longitude.toStringAsFixed(6)}"),
-
-            SizedBox(height: 20,),
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-            )
-          ],
 
         ],
       ),
@@ -185,7 +172,7 @@ Widget _buildMap(){
       mapController: _mapController,
         options: MapOptions(
       initialCenter: LatLng(27.7172, 85.3240),
-      initialZoom: 13,
+      initialZoom: 12,
       interactionOptions: const InteractionOptions(
         flags: InteractiveFlag.all,
       ),
@@ -196,26 +183,30 @@ Widget _buildMap(){
             subdomains: ['a', 'b', 'c'],
             userAgentPackageName: 'com.aayush.flutter_geolocator',
           ),
-          MarkerLayer(markers: [
+          MarkerLayer(
+              markers: [
             if(_currentPosition != null)
-            Marker(point: LatLng(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
-            ),
-                width: 40,
-                height: 40,
-                child: Icon(
-                  Icons.location_pin,
-                  color: Colors.red,
-                  size: 40,
-                )),
-            ..._friendLocations.map((location) => Marker(
-                point: location,
-                child: Icon(
-                  Icons.person_pin_circle,
-                  color: Colors.blue,
-                  size: 40,
-                )))
+              Marker(point: LatLng(
+                _currentPosition!.latitude,
+                _currentPosition!.longitude,
+              ),
+                  width: 40,
+                  height: 40,
+                  child: Icon(
+                    Icons.location_pin,
+                    color: Colors.red,
+                    size: 40,
+                  )),
+              // if(_currentPosition != null)
+              ..._friendLocations.map((location) =>
+                  Marker(
+                      point: location,
+                      child: Icon(
+                        Icons.person_pin_circle,
+                        color: Colors.blue,
+                        size: 40,
+                      ))),
+
           ])
         ]
 
@@ -223,13 +214,32 @@ Widget _buildMap(){
 }
 
   //buildActionOverlay widget
+  Widget _buildActionOverlay(){
+    return Positioned(
+      bottom: 20,
+        left: 20,
+        right: 20,
+        child: ElevatedButton.icon(
+            onPressed: _isLoading?null:_getLocation,
+            label: _isLoading?Text("LOCATING YOU"):Text("GET MY CURRENT LOCATION",
+              style: TextStyle(
+                fontWeight: FontWeight.bold
+              ),
+            ),
+            icon: _isLoading?SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white,),):Icon(Icons.location_on)));
+  }
 
   //function to fetch current location
 Future<void> _getLocation() async{
+    setState(() {
+      _status = "Locating you....";
+      _isLoading = true;
+    });
+
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if(!serviceEnabled){
       setState(() {
-        _locationMessage = "Location service is not enabled, please enable it";
+        _status = "Location service is not enabled, please enable it";
       });
     }
 
@@ -238,14 +248,14 @@ Future<void> _getLocation() async{
         permission = await Geolocator.requestPermission();
         if(permission == LocationPermission.denied){
           setState(() {
-            _locationMessage = "Location permission is denied";
+            _status = "Location permission is denied";
           });
         }
     }
 
     if(permission == LocationPermission.deniedForever){
       setState(() {
-        _locationMessage = "Location permission is denied forever, please enable it from settings.";
+        _status = "Location permission is denied forever, please enable it from settings.";
       });
     }
 
@@ -256,13 +266,16 @@ Future<void> _getLocation() async{
       );
 
       setState(() {
-        _locationMessage = "Location found";
+        _status = "Your current location found";
+        _isLoading = false;
         _currentPosition = position;
       });
+      _mapController.move(LatLng(position.latitude, position.longitude), 19);
     }
     catch(e){
       setState(() {
-        _locationMessage = "Error: $e";
+        _status = "Error: $e";
+        _isLoading = false;
       });
     }
 
