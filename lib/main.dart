@@ -13,6 +13,23 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
+      //theme for the application
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: Colors.black,
+        scaffoldBackgroundColor: const Color(0xFF151414),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30)
+          )
+        )
+      ),
       home: LocationScreen(),
     );
   }
@@ -41,10 +58,22 @@ class _LocationScreenState extends State<LocationScreen> {
       Text("Flutter geolocation",
       style: TextStyle(
         color: Colors.white,
+        letterSpacing: 3,
         // fontSize: 20
         fontWeight: FontWeight.bold
       )),
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        leading: Icon(Icons.gps_fixed),
+
+        // actions: [
+        //   IconButton(onPressed: (){
+        //     ScaffoldMessenger.of(context).showSnackBar(
+        //         const SnackBar(content: Text("This is an alert!")));
+        //   },
+        //       icon: Icon(Icons.add_alert))
+        // ],
+
       ),
       body: Center(
         child: Column(
@@ -79,6 +108,9 @@ class _LocationScreenState extends State<LocationScreen> {
                     _currentPosition!.longitude,
                   ),
                   initialZoom: 15,
+                  interactionOptions: const InteractionOptions(
+                    flags: InteractiveFlag.all,
+                  ),
                 ),
                     children: [
                       TileLayer(
@@ -160,3 +192,5 @@ Future<void> _getLocation() async{
 
   }
 }
+
+
