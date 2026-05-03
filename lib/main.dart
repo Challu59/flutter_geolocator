@@ -100,19 +100,50 @@ class _LocationScreenState extends State<LocationScreen> {
                     children: [
                       _buildMap(),
 
+                      // Positioned(
+                      //     top: 15,
+                      //       right: 15,
+                      //       child: IconButton(
+                      //                 iconSize: 32,
+                      //                 onPressed: (){
+                      //                   setState(() {
+                      //                     _showFriends = !_showFriends;
+                      //                   });
+                      //                 },
+                      //                 icon: !_showFriends? Icon(Icons.group, color: Colors.black,): Icon(Icons.group_off, color: Colors.black,)),
+                      //
+                      //
+                      // ),
+
+                      //design change
                       Positioned(
-                          top: 15,
-                            right: 15,
-                            child: IconButton(
-                                      iconSize: 32,
-                                      onPressed: (){
-                                        setState(() {
-                                          _showFriends = !_showFriends;
-                                        });
-                                      },
-                                      icon: !_showFriends? Icon(Icons.group, color: Colors.black,): Icon(Icons.group_off, color: Colors.black,)),
-
-
+                        top: 15,
+                        right: 15,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: _showFriends ? Colors.white : Colors.black,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 10,
+                              )
+                            ],
+                          ),
+                          child: IconButton(
+                            iconSize: 28,
+                            icon: Icon(
+                              _showFriends ? Icons.group_rounded : Icons.group_outlined,
+                              color: _showFriends ? Colors.black : Colors.white,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _showFriends = !_showFriends;
+                              });
+                            },
+                          ),
+                        ),
                       ),
                       if (_isLoading)
                         Container(
