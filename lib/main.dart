@@ -141,6 +141,7 @@ class _LocationScreenState extends State<LocationScreen> {
                               setState(() {
                                 _showFriends = !_showFriends;
                               });
+                              _showBroaderMap();
                             },
                           ),
                         ),
@@ -327,6 +328,18 @@ Future<void> _getLocation() async{
     }
 
   }
+
+
+  // zoom out map when showing friend locations
+  void _showBroaderMap() {
+
+    if (_showFriends){
+      _mapController.move(LatLng(_currentPosition!.latitude, _currentPosition!.longitude), 11);
+
+    }
+
+  }
+
 }
 
 
